@@ -19,6 +19,8 @@ export type {
   ITranslate
 } from './typings';
 
+window.ExerciseApi = ExerciseApi;
+
 export {
   IExerciseApi,
   ExerciseApi
