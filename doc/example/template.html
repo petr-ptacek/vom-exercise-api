@@ -1,0 +1,36 @@
+<!-- django template from Marek -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise</title>
+
+    <!-- support libraries, VUE,  KONVA, JQERY -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- interface from mapulary -->
+    <script src="interface.js"></script>
+    <!-- include css from mapulary -->
+
+    <!-- ---------------- includede dynamically based exercise type = database from Marek -->
+    <script src="myexcercise.js"></script>
+    <!-- include css -->
+
+    <script type="application/javascript">
+        // definition from database and running exercise
+        let exercise = new MyExcercise("0b6b960c-7f65-11ec-a8a3-0242ac120002");
+    </script>
+    <!-- ---------------- end from Marek -->
+
+</head>
+<body>
+    <div id="exercise_header">
+        <div id="title">Title of exercise</div>
+        <button onclick="exercise.start()" name="run" >Spustit</button>
+    </div>
+    <div id="exercise_main">
+
+        <!-- main space for programmer -->
+    </div>
+</body>
+</html>

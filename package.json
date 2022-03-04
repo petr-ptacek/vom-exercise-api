@@ -1,0 +1,36 @@
+{
+  "name": "@petr-ptacek/exercise-js-api",
+  "version": "0.0.1",
+  "author": {
+    "name": "Petr Ptacek",
+    "email": "petr.ptacek99@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/petr-ptacek/vom-exercise-api.git"
+  },
+  "main": "./dist/exercise-api.umd.js",
+  "exports": {
+    ".": "./dist/exercise-api.es.js"
+  },
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "clear": "rimraf ./dist",
+    "dev": "vite build --mode development --watch --clearScreen --sourcemap",
+    "build": "npm run clear && tsc && vite build && npm run build:types",
+    "build:types": "tsc --project ./tsconfig.types.json"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.10",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2"
+  },
+  "dependencies": {
+    "mitt": "^3.0.0"
+  }
+}
