@@ -23,8 +23,10 @@ export interface ICreateExerciseFn {
 }
 
 export function createUserExerciseFactory(constructorOptions: IOptions): ICreateExerciseFn {
+  const _window = window;
+
   return (options: ICreateExerciseOptions) => {
-    window.ExerciseApi.exercise = new class extends Exercise {
+    _window.ExerciseApi.exercise = new class extends Exercise {
       constructor() {
         super(constructorOptions);
       }
@@ -57,7 +59,7 @@ export function createUserExerciseFactory(constructorOptions: IOptions): ICreate
       }
     };
 
-    return window.ExerciseApi.exercise;
+    return _window.ExerciseApi.exercise;
   };
 
 }

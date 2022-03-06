@@ -7,11 +7,13 @@ declare global {
     Urls: { [key: string]: (...args: unknown[]) => string };
   }
 }
+window.ExerciseApi = ExerciseApi;
 
 export type { ICreateExerciseOptions, ICreateExerciseFn } from './createUserExerciseFactory';
 export { createUserExerciseFactory }                      from './createUserExerciseFactory';
 
 export { createUserExercise } from './createUserExercise';
+export { Exercise }           from './Exercise';
 
 export type {
   ICard,
@@ -20,8 +22,6 @@ export type {
   IMap,
   ITranslate
 } from './typings';
-
-window.ExerciseApi = ExerciseApi;
 
 export {
   IExerciseApi,
