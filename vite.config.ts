@@ -8,7 +8,7 @@ export default defineConfig({
       name: 'ExerciseApi',
       formats: ['umd', 'es'],
       entry: path.resolve(__dirname, './src/index.ts'),
-      fileName: (format => `exercise-api.${ format }.js`)
+      fileName: (format => `vom-exercise-api.${ format }.js`)
     }
   },
   resolve: {

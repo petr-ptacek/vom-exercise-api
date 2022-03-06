@@ -9,9 +9,9 @@
     "type": "git",
     "url": "git+https://github.com/petr-ptacek/vom-exercise-api.git"
   },
-  "main": "./dist/exercise-api.umd.js",
+  "main": "./dist/vom-exercise-api.es.js",
   "exports": {
-    ".": "./dist/exercise-api.es.js"
+    ".": "./dist/vom-exercise-api.es.js"
   },
   "types": "./dist/types/index.d.ts",
   "files": [

@@ -8,8 +8,10 @@ declare global {
   }
 }
 
-export type { ICreateExerciseOptions } from './createExercise';
-export { createExercise }              from './createExercise';
+export type { ICreateExerciseOptions, ICreateExerciseFn } from './createUserExerciseFactory';
+export { createUserExerciseFactory }                      from './createUserExerciseFactory';
+
+export { createUserExercise } from './createUserExercise';
 
 export type {
   ICard,
