@@ -28,6 +28,7 @@ export interface IMap {
 
 export interface ITranslate {
   id: string;
+  map_id: string;
   name: string;
   description: string;
   cards: string[];
@@ -35,6 +36,8 @@ export interface ITranslate {
 
 export interface ICard {
   id: string;
+  map_id: string;
+  map_translate_id: string;
   picture: string;
   card_translate: string;
 }

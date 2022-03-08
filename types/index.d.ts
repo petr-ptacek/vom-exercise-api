@@ -11,7 +11,8 @@ declare global {
 export type { ICreateExerciseOptions, ICreateExerciseFn } from './createUserExerciseFactory';
 export { createUserExerciseFactory } from './createUserExerciseFactory';
 export { createUserExercise } from './createUserExercise';
-export { Exercise } from './Exercise';
+export { Exercise } from './Exercise/Exercise.js';
+export { EXERCISE_UTILS } from './EXERCISE_UTILS';
 export type { ICard, IConfiguration, ILanguage, IMap, ITranslate } from './typings';
 export { IExerciseApi, ExerciseApi };
 //# sourceMappingURL=index.d.ts.map

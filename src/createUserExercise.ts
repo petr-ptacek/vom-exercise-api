@@ -1,4 +1,4 @@
-import { Exercise }               from './Exercise';
+import { Exercise }               from './Exercise/Exercise.js';
 import { ICreateExerciseOptions } from './createUserExerciseFactory';
 
 export function createUserExercise(options: ICreateExerciseOptions): Exercise {

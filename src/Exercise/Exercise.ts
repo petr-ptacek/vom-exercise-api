@@ -1,24 +1,31 @@
-import { ApiService }                                                               from './service';
-import { execAsync, isBoolean, isNull, aspectRatio, isNumber }                      from './utils';
-import { EventEmitter }                                                             from './EventEmitter';
-import { Dictionary, ICard, IConfiguration, ILanguage, IMap, ITranslate, Nullable } from './typings';
-
-export type SetupFn = () => Promise<ISetupData> | ISetupData;
-export type OnStartFn = () => void;
-export type OnEndFn = () => void;
-export type OnBeforeEndFn = () => boolean;
-export type OnTimeExpiredFn = () => void;
-export type OnInitializedFn = (errors: ValidationError[]) => boolean;
+import type {
+  Dictionary,
+  ICard,
+  IConfiguration,
+  ILanguage,
+  IMap,
+  ITranslate,
+  Nullable
+}                         from '../typings/index.js';
+import { ApiService }     from '../service/index.js';
+import {
+  execAsync,
+  isBoolean,
+  isNull,
+  isNumber
+}                         from '../utils/index.js';
+import { EventEmitter }   from '../EventEmitter/index.js';
+import { EXERCISE_UTILS } from '../EXERCISE_UTILS.js';
 
 export interface IData {
   loading: boolean;
   initialized: boolean;
   attemptId: string;
-  totalSteps: number | null;
-  currentStep: number | null;
-  startAt: Date | null;
-  configuration: IConfiguration | null;
-  answers: (boolean | null)[];
+  totalSteps: Nullable<number>;
+  currentStep: Nullable<number>;
+  startAt: Nullable<Date>;
+  configuration: Nullable<IConfiguration>;
+  answers: Nullable<boolean>[];
 
   timeExpireCheckerIntervalId: number | null;
   timeExpireNotifySeconds: number | null;
@@ -43,9 +50,7 @@ export type ValidationError = {
 export abstract class Exercise {
   private _data: IData;
 
-  public readonly utils = Object.freeze({
-    aspectRatio
-  });
+  public readonly utils = EXERCISE_UTILS;
 
   constructor(options: IOptions) {
     this._data = {
@@ -410,6 +415,22 @@ export abstract class Exercise {
       },
       [] as number[]
     );
+  }
+
+  public getConfigProperty(key: string) {
+    if ( !this.config || !(key in this.config) ) {
+      return undefined;
+    }
+
+    return this.config[key];
+  }
+
+  public getConfigParamProperty(key: string) {
+    if ( !this.configParams || !(key in this.configParams) ) {
+      return undefined;
+    }
+
+    return this.configParams[key];
   }
 
   public async getMap(mapId: string): Promise<IMap> {

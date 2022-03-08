@@ -1,20 +1,13 @@
-import { aspectRatio } from './utils';
-import { Dictionary, ICard, IConfiguration, ILanguage, IMap, ITranslate, Nullable } from './typings';
-export declare type SetupFn = () => Promise<ISetupData> | ISetupData;
-export declare type OnStartFn = () => void;
-export declare type OnEndFn = () => void;
-export declare type OnBeforeEndFn = () => boolean;
-export declare type OnTimeExpiredFn = () => void;
-export declare type OnInitializedFn = (errors: ValidationError[]) => boolean;
+import type { Dictionary, ICard, IConfiguration, ILanguage, IMap, ITranslate, Nullable } from '../typings/index.js';
 export interface IData {
     loading: boolean;
     initialized: boolean;
     attemptId: string;
-    totalSteps: number | null;
-    currentStep: number | null;
-    startAt: Date | null;
-    configuration: IConfiguration | null;
-    answers: (boolean | null)[];
+    totalSteps: Nullable<number>;
+    currentStep: Nullable<number>;
+    startAt: Nullable<Date>;
+    configuration: Nullable<IConfiguration>;
+    answers: Nullable<boolean>[];
     timeExpireCheckerIntervalId: number | null;
     timeExpireNotifySeconds: number | null;
     timeExpireNotifyHandler: (() => void) | null;
@@ -33,9 +26,7 @@ export declare type ValidationError = {
 };
 export declare abstract class Exercise {
     private _data;
-    readonly utils: Readonly<{
-        aspectRatio: typeof aspectRatio;
-    }>;
+    readonly utils: Readonly<import("../EXERCISE_UTILS.js").IExerciseUtils>;
     constructor(options: IOptions);
     get attemptId(): string;
     get config(): Nullable<Dictionary>;
@@ -82,6 +73,8 @@ export declare abstract class Exercise {
     getAnswers(): (boolean | null)[];
     getTrueAnswers(): number[];
     getFalseAnswers(): number[];
+    getConfigProperty(key: string): unknown;
+    getConfigParamProperty(key: string): unknown;
     getMap(mapId: string): Promise<IMap>;
     getTranslate(mapTranslateId: string): Promise<ITranslate>;
     getCard(mapTranslateId: string, cardId: string): Promise<ICard>;

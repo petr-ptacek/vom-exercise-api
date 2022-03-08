@@ -1,5 +1,5 @@
-import type { IOptions, ISetupData, ValidationError } from './Exercise';
-import { Exercise }                                   from './Exercise';
+import type { IOptions, ISetupData, ValidationError } from './Exercise/Exercise.js';
+import { Exercise }                                   from './Exercise/Exercise.js';
 
 
 export interface ICreateExerciseOptions {
@@ -32,6 +32,7 @@ export function createUserExerciseFactory(constructorOptions: IOptions): ICreate
       }
 
       protected onAllAnswersFilled(): void {
+        return options.onAllAnswersFilled();
       }
 
       protected onBeforeEnd(): boolean {

@@ -1,5 +1,5 @@
-import type { IOptions, ISetupData, ValidationError } from './Exercise';
-import { Exercise } from './Exercise';
+import type { IOptions, ISetupData, ValidationError } from './Exercise/Exercise.js';
+import { Exercise } from './Exercise/Exercise.js';
 export interface ICreateExerciseOptions {
     setup(): Promise<ISetupData> | ISetupData;
     onInitialized(errors: ValidationError[]): Promise<boolean> | boolean;

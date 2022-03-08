@@ -1,5 +1,5 @@
 import { Handler } from 'mitt';
-import { Exercise } from '../Exercise.js';
+import { Exercise } from '../Exercise/Exercise.js';
 export declare type EventTypes = {
     'EXERCISE_INSTANCE_CREATED': Exercise;
     'EXERCISE_INITIALIZED': boolean;

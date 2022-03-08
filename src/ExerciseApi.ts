@@ -1,5 +1,5 @@
 import { EmitHandler, EventEmitter, OffHandler, OnHandler } from './EventEmitter';
-import { Exercise }                                         from './Exercise';
+import { Exercise }                                         from './Exercise/Exercise.js';
 import { createUserExercise }                               from './createUserExercise';
 
 export interface IExerciseApi {

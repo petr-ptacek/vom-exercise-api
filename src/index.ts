@@ -13,7 +13,9 @@ export type { ICreateExerciseOptions, ICreateExerciseFn } from './createUserExer
 export { createUserExerciseFactory }                      from './createUserExerciseFactory';
 
 export { createUserExercise } from './createUserExercise';
-export { Exercise }           from './Exercise';
+export { Exercise }           from './Exercise/Exercise.js';
+
+export { EXERCISE_UTILS } from './EXERCISE_UTILS';
 
 export type {
   ICard,
