@@ -67,7 +67,7 @@ export declare abstract class Exercise {
     start(): Promise<void>;
     end(): Promise<void>;
     beforeEnd(): boolean;
-    timeExpired(): void;
+    timeExpired(): Promise<void>;
     showLoader(): void;
     hideLoader(): void;
     getAnswers(): (boolean | null)[];

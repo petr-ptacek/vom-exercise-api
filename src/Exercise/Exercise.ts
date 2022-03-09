@@ -373,8 +373,9 @@ export abstract class Exercise {
     return this.onBeforeEnd();
   }
 
-  public timeExpired(): void {
+  public async timeExpired(): Promise<void> {
     this._detachTimeExpiredChecker();
+    await this.end();
     this.onTimeExpired();
     EventEmitter.emit('EXERCISE_TIME_EXPIRED');
   }
