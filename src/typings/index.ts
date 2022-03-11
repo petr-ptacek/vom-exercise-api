@@ -2,6 +2,15 @@ export type Nullable<T = any> = T | null
 
 export type Dictionary<T = unknown> = { [key: string]: T };
 
+export type ShowMessageOptionsT = {
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  confirmCallback?: () => void;
+  cancelLabel?: string;
+  cancelCallback?: () => void;
+}
+
 export interface ILanguage {
   description: string;
   icon_image: string;
@@ -16,6 +25,7 @@ export interface IConfiguration {
   exercise_name: string;
   native_language: ILanguage;
   exercise_language: ILanguage;
+  count_cards_total: number;
   max_duration_minutes: number | null;
 }
 

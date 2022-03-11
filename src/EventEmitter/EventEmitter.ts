@@ -1,5 +1,6 @@
-import mitt, { Handler } from 'mitt';
-import { Exercise }      from '../Exercise/Exercise.js';
+import mitt, { Handler }            from 'mitt';
+import { Exercise }                 from '../Exercise/Exercise';
+import type { ShowMessageOptionsT } from '../typings/';
 
 export type EventTypes = {
   'EXERCISE_INSTANCE_CREATED': Exercise;
@@ -8,6 +9,9 @@ export type EventTypes = {
   'EXERCISE_TIME_EXPIRED': void;
   'EXERCISE_BEFORE_END': void;
   'EXERCISE_END': void;
+  'EXERCISE_EXIT': void;
+
+  'EXERCISE_MESSAGE_SHOW': ShowMessageOptionsT;
 
   'EXERCISE_ANSWER_SET': void;
   'EXERCISE_ALL_ANSWERS_FILLED': void;

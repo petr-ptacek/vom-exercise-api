@@ -1,4 +1,4 @@
-import type { Dictionary, ICard, IConfiguration, ILanguage, IMap, ITranslate, Nullable } from '../typings/index.js';
+import type { Dictionary, ICard, IConfiguration, ILanguage, IMap, ITranslate, Nullable, ShowMessageOptionsT } from '../typings';
 export interface IData {
     loading: boolean;
     initialized: boolean;
@@ -26,7 +26,7 @@ export declare type ValidationError = {
 };
 export declare abstract class Exercise {
     private _data;
-    readonly utils: Readonly<import("../EXERCISE_UTILS.js").IExerciseUtils>;
+    readonly utils: Readonly<import("../EXERCISE_UTILS").IExerciseUtils>;
     constructor(options: IOptions);
     get attemptId(): string;
     get config(): Nullable<Dictionary>;
@@ -35,6 +35,7 @@ export declare abstract class Exercise {
     get exerciseName(): Nullable<string>;
     get nativeLanguage(): Nullable<ILanguage>;
     get exerciseLanguage(): Nullable<ILanguage>;
+    get cardsCountTotal(): number;
     get totalSteps(): Nullable<number>;
     get currentStep(): Nullable<number>;
     get completionPercentage(): number;
@@ -70,6 +71,8 @@ export declare abstract class Exercise {
     timeExpired(): Promise<void>;
     showLoader(): void;
     hideLoader(): void;
+    exit(): void;
+    showMessage(options: ShowMessageOptionsT): void;
     getAnswers(): (boolean | null)[];
     getTrueAnswers(): number[];
     getFalseAnswers(): number[];

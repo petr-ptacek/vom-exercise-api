@@ -5,17 +5,18 @@ import type {
   ILanguage,
   IMap,
   ITranslate,
-  Nullable
-}                         from '../typings/index.js';
-import { ApiService }     from '../service/index.js';
+  Nullable,
+  ShowMessageOptionsT
+}                         from '../typings';
+import { ApiService }     from '../service';
 import {
   execAsync,
   isBoolean,
   isNull,
   isNumber
-}                         from '../utils/index.js';
-import { EventEmitter }   from '../EventEmitter/index.js';
-import { EXERCISE_UTILS } from '../EXERCISE_UTILS.js';
+}                         from '../utils';
+import { EventEmitter }   from '../EventEmitter';
+import { EXERCISE_UTILS } from '../EXERCISE_UTILS';
 
 export interface IData {
   loading: boolean;
@@ -67,9 +68,7 @@ export abstract class Exercise {
       timeExpireNotifyHandler: null
     };
 
-    window.setTimeout(
-      () => EventEmitter.emit('EXERCISE_INSTANCE_CREATED', this)
-    );
+    EventEmitter.emit('EXERCISE_INSTANCE_CREATED', this);
   }
 
   get attemptId(): string {
@@ -98,6 +97,10 @@ export abstract class Exercise {
 
   get exerciseLanguage(): Nullable<ILanguage> {
     return this._data.configuration?.exercise_language ?? null;
+  }
+
+  get cardsCountTotal(): number {
+    return this._data.configuration?.count_cards_total ?? 0;
   }
 
   get totalSteps(): Nullable<number> {
@@ -388,6 +391,14 @@ export abstract class Exercise {
   public hideLoader(): void {
     this._data.loading = false;
     EventEmitter.emit('EXERCISE_LOADER_HIDE');
+  }
+
+  public exit(): void {
+    EventEmitter.emit('EXERCISE_EXIT');
+  }
+
+  public showMessage(options: ShowMessageOptionsT): void {
+    EventEmitter.emit('EXERCISE_MESSAGE_SHOW', options);
   }
 
   public getAnswers(): (boolean | null)[] {
