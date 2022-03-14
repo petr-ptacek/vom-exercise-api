@@ -20,7 +20,6 @@
   ],
   "scripts": {
     "clear": "rimraf ./dist ./types",
-    "version": "npm run build",
     "dev": "vite build --mode production --watch --clearScreen --sourcemap",
     "build": "npm run clear && tsc && vite build && npm run build:types",
     "build:types": "rimraf ./types && tsc --project ./tsconfig.types.json",
