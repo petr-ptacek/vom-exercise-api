@@ -1,14 +1,15 @@
-import { IConfiguration, Nullable } from '../typings';
+import type { NullableT }      from '../typings';
+import type { ConfigurationT } from './typings';
 
 export interface IExerciseData {
   loading: boolean;
   initialized: boolean;
   attemptId: string;
-  totalSteps: Nullable<number>;
-  currentStep: Nullable<number>;
-  startAt: Nullable<Date>;
-  configuration: Nullable<IConfiguration>;
-  answers: Nullable<boolean>[];
+  totalSteps: NullableT<number>;
+  currentStep: NullableT<number>;
+  startAt: NullableT<Date>;
+  configuration: NullableT<ConfigurationT>;
+  answers: NullableT<boolean>[];
 
   timeExpireCheckerIntervalId: number | null;
   timeExpireNotifySeconds: number | null;

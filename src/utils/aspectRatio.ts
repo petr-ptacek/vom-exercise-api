@@ -2,21 +2,27 @@
 // newHeight = (originalHeight / originalWidth) * newWidth
 // newWidth = (newHeight * originalWidth) / originalHeight
 
-export interface ImgAspectRatioOptions {
+export type AspectRatioOptionsT = {
   originalWidth: number;
   originalHeight: number;
   newWidth?: number;
   newHeight?: number;
 }
 
-export interface ImgAspectRatioResult {
+export type AspectRatioResultT = {
   width: number;
   height: number;
 }
 
-export function aspectRatio(options: ImgAspectRatioOptions): ImgAspectRatioResult {
-  const { originalHeight, originalWidth, newWidth, newHeight } = options;
-  const result = {
+export function aspectRatio(options: AspectRatioOptionsT): AspectRatioResultT {
+  const {
+    originalHeight,
+    originalWidth,
+    newWidth,
+    newHeight
+  } = options;
+
+  const result: AspectRatioResultT = {
     width: originalWidth,
     height: originalHeight
   };

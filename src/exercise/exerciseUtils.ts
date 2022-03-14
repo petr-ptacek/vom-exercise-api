@@ -1,4 +1,8 @@
-import { aspectRatio, shuffleArray, getRandomNumber } from './utils';
+import {
+  aspectRatio,
+  shuffleArray,
+  getRandomNumber
+} from '../utils';
 
 export interface IExerciseUtils {
   aspectRatio: typeof aspectRatio;
@@ -6,7 +10,7 @@ export interface IExerciseUtils {
   getRandomNumber: typeof getRandomNumber;
 }
 
-export const EXERCISE_UTILS: Readonly<IExerciseUtils> = Object.freeze<IExerciseUtils>({
+export const exerciseUtils: Readonly<IExerciseUtils> = Object.freeze<IExerciseUtils>({
   aspectRatio,
   shuffleArray,
   getRandomNumber

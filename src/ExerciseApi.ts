@@ -1,28 +1,26 @@
-import { EmitHandler, EventEmitter, OffHandler, OnHandler } from './EventEmitter';
-import { Exercise }                                         from './Exercise/Exercise.js';
-import { createUserExercise }                               from './createUserExercise';
+import {
+  Exercise,
+  exerciseEmitter,
+  createUserExercise,
+  createExercise
+} from './exercise';
 
 export interface IExerciseApi {
   exercise: Exercise | null;
+  createExercise: typeof createExercise | null;
   createUserExercise: typeof createUserExercise | null;
-  addEventListener: OnHandler;
-  removeEventListener: OffHandler;
-  dispatchEvent: EmitHandler;
+  addEventListener: typeof exerciseEmitter.on;
+  removeEventListener: typeof exerciseEmitter.off;
+  dispatchEvent: typeof exerciseEmitter.emit;
 }
 
 const ExerciseApi: IExerciseApi = {
   exercise: null,
+  createExercise: null,
   createUserExercise: null,
-
-  addEventListener(type, handler) {
-    EventEmitter.on(type, handler);
-  },
-  removeEventListener(type, handler) {
-    EventEmitter.off(type, handler);
-  },
-  dispatchEvent(type, event) {
-    EventEmitter.emit(type, event);
-  }
+  addEventListener: exerciseEmitter.on,
+  removeEventListener: exerciseEmitter.off,
+  dispatchEvent: exerciseEmitter.emit
 };
 
 export { ExerciseApi };

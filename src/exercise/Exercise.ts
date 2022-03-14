@@ -1,59 +1,36 @@
 import type {
-  Dictionary,
-  ICard,
-  IConfiguration,
-  ILanguage,
-  IMap,
-  ITranslate,
-  Nullable,
-  ShowMessageOptionsT
-}                         from '../typings';
-import { ApiService }     from '../service';
+  DictionaryT,
+  NullableT
+}                          from '../typings';
+import type {
+  CardT,
+  ConfigurationT,
+  LanguageT,
+  MapT,
+  MapTranslateT,
+  ShowMessageOptionsT,
+  ValidationErrorT,
+  IData,
+  ISetupData,
+  IConstructorOptions,
+  IUserDefinedHooks
+}                          from './typings';
+import { ApiService }      from '../service';
 import {
   execAsync,
   isBoolean,
   isNull,
   isNumber
-}                         from '../utils';
-import { EventEmitter }   from '../EventEmitter';
-import { EXERCISE_UTILS } from '../EXERCISE_UTILS';
+}                          from '../utils';
+import { exerciseEmitter } from './exerciseEmitter';
+import { exerciseUtils }   from './exerciseUtils';
 
-export interface IData {
-  loading: boolean;
-  initialized: boolean;
-  attemptId: string;
-  totalSteps: Nullable<number>;
-  currentStep: Nullable<number>;
-  startAt: Nullable<Date>;
-  configuration: Nullable<IConfiguration>;
-  answers: Nullable<boolean>[];
+export abstract class Exercise implements IUserDefinedHooks {
+  private readonly _data: IData;
+  private readonly _emitter = exerciseEmitter;
+  public readonly utils = exerciseUtils;
 
-  timeExpireCheckerIntervalId: number | null;
-  timeExpireNotifySeconds: number | null;
-  timeExpireNotifyHandler: (() => void) | null;
-}
-
-export interface ISetupData {
-  totalSteps: number;
-  timeExpireNotifySeconds?: number;
-  timeExpireNotifyHandler?: () => void;
-}
-
-export interface IOptions {
-  exerciseAttemptId: string;
-}
-
-export type ValidationError = {
-  type: 'server' | 'internal';
-  message: string;
-}
-
-export abstract class Exercise {
-  private _data: IData;
-
-  public readonly utils = EXERCISE_UTILS;
-
-  constructor(options: IOptions) {
+  constructor(options: IConstructorOptions) {
     this._data = {
       loading: false,
       attemptId: options.exerciseAttemptId,
@@ -63,39 +40,43 @@ export abstract class Exercise {
       currentStep: null,
       totalSteps: null,
       answers: [],
+
       timeExpireCheckerIntervalId: null,
       timeExpireNotifySeconds: null,
       timeExpireNotifyHandler: null
     };
 
-    EventEmitter.emit('EXERCISE_INSTANCE_CREATED', this);
+    this._emitter.emit(
+      'instance-created',
+      { exercise: this }
+    );
   }
 
   get attemptId(): string {
     return this._data.attemptId;
   }
 
-  get config(): Nullable<Dictionary> {
+  get config(): NullableT<DictionaryT> {
     return this._data.configuration?.config ?? null;
   }
 
-  get configParams(): Nullable<Dictionary> {
+  get configParams(): NullableT<DictionaryT> {
     return this._data.configuration?.config_params ?? null;
   }
 
-  get mapIds(): Nullable<string[]> {
+  get mapIds(): NullableT<string[]> {
     return this._data.configuration?.maps ?? null;
   }
 
-  get exerciseName(): Nullable<string> {
+  get exerciseName(): NullableT<string> {
     return this._data.configuration?.exercise_name ?? null;
   }
 
-  get nativeLanguage(): Nullable<ILanguage> {
+  get nativeLanguage(): NullableT<LanguageT> {
     return this._data.configuration?.native_language ?? null;
   }
 
-  get exerciseLanguage(): Nullable<ILanguage> {
+  get exerciseLanguage(): NullableT<LanguageT> {
     return this._data.configuration?.exercise_language ?? null;
   }
 
@@ -103,11 +84,11 @@ export abstract class Exercise {
     return this._data.configuration?.count_cards_total ?? 0;
   }
 
-  get totalSteps(): Nullable<number> {
+  get totalSteps(): NullableT<number> {
     return this._data.totalSteps;
   }
 
-  get currentStep(): Nullable<number> {
+  get currentStep(): NullableT<number> {
     return this._data.currentStep;
   }
 
@@ -135,25 +116,25 @@ export abstract class Exercise {
     return this._data.loading;
   }
 
-  get maxDurationMinutes(): Nullable<number> {
+  get maxDurationMinutes(): NullableT<number> {
     return this._data.configuration?.max_duration_minutes ?? null;
   }
 
-  protected abstract setup(): Promise<ISetupData> | ISetupData;
+  abstract onSetup(): Promise<ISetupData>;
 
-  protected abstract onInitialized(errors: ValidationError[]): Promise<boolean> | boolean;
+  abstract onInitialized(errors: ValidationErrorT[]): Promise<boolean>;
 
-  protected abstract onStart(): Promise<void> | void
+  abstract onStart(): Promise<boolean>
 
-  protected abstract onEnd(): void;
+  abstract onEnd(): Promise<boolean>;
 
-  protected abstract onBeforeEnd(): boolean;
+  abstract onBeforeEnd(): Promise<boolean>;
 
-  protected abstract onTimeExpired(): void;
+  abstract onTimeExpired(): Promise<boolean>;
 
-  protected abstract onAllAnswersFilled(): void;
+  abstract onAllAnswersFilled(): Promise<boolean>;
 
-  private async _validateServer(): Promise<ValidationError[]> {
+  private async _validateServer(): Promise<ValidationErrorT[]> {
     const result = await execAsync(
       ApiService.validate(this._data.attemptId)
     );
@@ -203,8 +184,8 @@ export abstract class Exercise {
     }
   }
 
-  private async _validateInternal(): Promise<ValidationError[]> {
-    const errors: ValidationError[] = [];
+  private async _validateInternal(): Promise<ValidationErrorT[]> {
+    const errors: ValidationErrorT[] = [];
 
     if ( typeof this._data.totalSteps !== 'number' ) {
       errors.push({
@@ -216,7 +197,7 @@ export abstract class Exercise {
     return errors;
   }
 
-  private async _validate(): Promise<ValidationError[]> {
+  private async _validate(): Promise<ValidationErrorT[]> {
     const [server, internal] = await Promise.all([
       this._validateServer(),
       this._validateInternal()
@@ -237,7 +218,7 @@ export abstract class Exercise {
     );
 
     this._data.currentStep = step;
-    EventEmitter.emit('EXERCISE_STEP_UPDATE');
+    this._emitter.emit('update-step', { exercise: this });
     return true;
   }
 
@@ -264,20 +245,20 @@ export abstract class Exercise {
     }
 
     if ( response ) {
-      this._data.configuration = response.data as IConfiguration;
+      this._data.configuration = response.data as ConfigurationT;
     }
   }
 
   public async initialize(): Promise<boolean> {
     await this._fetchConfigurationData();
 
-    const setupData: ISetupData = await this.setup();
+    const setupData: ISetupData = await this.onSetup();
     this._setup(setupData);
 
     const validationErrors = await this._validate();
     this._data.initialized = await this.onInitialized(validationErrors);
 
-    EventEmitter.emit('EXERCISE_INITIALIZED', this._data.initialized);
+    this._emitter.emit('initialized', { exercise: this });
     return this._data.initialized;
   }
 
@@ -291,11 +272,11 @@ export abstract class Exercise {
     );
 
     this._data.answers[step] = answer;
-    EventEmitter.emit('EXERCISE_ANSWER_SET');
+    this._emitter.emit('answer-set', { exercise: this });
 
     if ( this._data.answers.every(answer => isBoolean(answer)) ) {
       this.onAllAnswersFilled();
-      EventEmitter.emit('EXERCISE_ALL_ANSWERS_FILLED');
+      this._emitter.emit('all-answers-filled', { exercise: this });
     }
 
     return !!error;
@@ -354,7 +335,7 @@ export abstract class Exercise {
         this._attachTimeExpiredChecker();
       }
 
-      EventEmitter.emit('EXERCISE_START');
+      this._emitter.emit('start', { exercise: this });
     }
   }
 
@@ -369,10 +350,10 @@ export abstract class Exercise {
     // this._data.answers = [];
 
     await this.onEnd();
-    EventEmitter.emit('EXERCISE_END');
+    this._emitter.emit('end', { exercise: this });
   }
 
-  public beforeEnd(): boolean {
+  public beforeEnd(): Promise<boolean> {
     return this.onBeforeEnd();
   }
 
@@ -380,25 +361,31 @@ export abstract class Exercise {
     this._detachTimeExpiredChecker();
     await this.end();
     this.onTimeExpired();
-    EventEmitter.emit('EXERCISE_TIME_EXPIRED');
+    this._emitter.emit('time-expired', { exercise: this });
   }
 
   public showLoader(): void {
     this._data.loading = true;
-    EventEmitter.emit('EXERCISE_LOADER_SHOW');
+    this._emitter.emit('loader-show', { exercise: this });
   }
 
   public hideLoader(): void {
     this._data.loading = false;
-    EventEmitter.emit('EXERCISE_LOADER_HIDE');
+    this._emitter.emit('loader-hide', { exercise: this });
   }
 
   public exit(): void {
-    EventEmitter.emit('EXERCISE_EXIT');
+    this._emitter.emit('exit', { exercise: this });
   }
 
   public showMessage(options: ShowMessageOptionsT): void {
-    EventEmitter.emit('EXERCISE_MESSAGE_SHOW', options);
+    this._emitter.emit(
+      'message-show',
+      {
+        exercise: this,
+        data: options
+      }
+    );
   }
 
   public getAnswers(): (boolean | null)[] {
@@ -445,19 +432,19 @@ export abstract class Exercise {
     return this.configParams[key];
   }
 
-  public async getMap(mapId: string): Promise<IMap> {
+  public async getMap(mapId: string): Promise<MapT> {
     return (await ApiService.getMap(this._data.attemptId, mapId)).data!;
   }
 
-  public async getTranslate(mapTranslateId: string): Promise<ITranslate> {
+  public async getTranslate(mapTranslateId: string): Promise<MapTranslateT> {
     return (await ApiService.getMapTranslate(mapTranslateId)).data!;
   }
 
-  public async getCard(mapTranslateId: string, cardId: string): Promise<ICard> {
+  public async getCard(mapTranslateId: string, cardId: string): Promise<CardT> {
     return (await ApiService.getCard(mapTranslateId, cardId)).data!;
   }
 
-  public async getCards(mapTranslateId: string): Promise<ICard[]> {
+  public async getCards(mapTranslateId: string): Promise<CardT[]> {
     return (await ApiService.getCards(mapTranslateId)).data!;
   }
 }

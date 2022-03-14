@@ -1,6 +1,11 @@
-import { Urls }                                         from './Urls';
-import { HTTPController }                               from './HTTPController';
-import type { IMap, ITranslate, IConfiguration, ICard } from './../typings';
+import type {
+  MapT,
+  MapTranslateT,
+  ConfigurationT,
+  CardT
+}                         from './../exercise';
+import { Urls }           from './Urls';
+import { HTTPController } from './HTTPController';
 
 async function parseResponse<T = any>(response: Response): ApiService.PromisifyResponse<T> {
   const data = await HTTPController.parseResponseBodyJSON<T>(response);
@@ -22,31 +27,31 @@ export namespace ApiService {
 
 
 export class ApiService {
-  static async getExerciseConfiguration(exerciseAttemptId: string): ApiService.PromisifyResponse<IConfiguration> {
+  static async getExerciseConfiguration(exerciseAttemptId: string): ApiService.PromisifyResponse<ConfigurationT> {
     const url: string = window.Urls[Urls.InitConfiguration](exerciseAttemptId);
     const response = await HTTPController.get(url);
     return parseResponse(response);
   }
 
-  static async getMap(exerciseAttemptId: string, mapId: string): ApiService.PromisifyResponse<IMap> {
+  static async getMap(exerciseAttemptId: string, mapId: string): ApiService.PromisifyResponse<MapT> {
     const url: string = window.Urls[Urls.Map](exerciseAttemptId, mapId);
     const response = await HTTPController.get(url);
     return parseResponse(response);
   }
 
-  static async getMapTranslate(mapTranslateId: string): ApiService.PromisifyResponse<ITranslate> {
+  static async getMapTranslate(mapTranslateId: string): ApiService.PromisifyResponse<MapTranslateT> {
     const url: string = window.Urls[Urls.MapTranslate](mapTranslateId);
     const response = await HTTPController.get(url);
     return parseResponse(response);
   }
 
-  static async getCard(mapTranslateId: string, cardId: string): ApiService.PromisifyResponse<ICard> {
+  static async getCard(mapTranslateId: string, cardId: string): ApiService.PromisifyResponse<CardT> {
     const url: string = window.Urls[Urls.Card](cardId, mapTranslateId);
     const response = await HTTPController.get(url);
     return parseResponse(response);
   }
 
-  static async getCards(mapTranslateId: string): ApiService.PromisifyResponse<ICard[]> {
+  static async getCards(mapTranslateId: string): ApiService.PromisifyResponse<CardT[]> {
     const url: string = window.Urls[Urls.Cards](mapTranslateId);
     const response = await HTTPController.get(url);
     return parseResponse(response);

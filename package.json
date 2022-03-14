@@ -12,11 +12,10 @@
   },
   "main": "./dist/vom-exercise-api.es.js",
   "exports": "./dist/vom-exercise-api.es.js",
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "src",
-    "types"
+    "src"
   ],
   "scripts": {
     "clear": "rimraf ./dist ./types",

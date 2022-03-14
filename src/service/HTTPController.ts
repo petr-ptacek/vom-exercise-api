@@ -1,10 +1,10 @@
 import { getCookies } from './../utils';
 
-export type RequestMethod = 'GET' | 'POST' | 'PUT';
+export type RequestMethodT = 'GET' | 'POST' | 'PUT';
 
-export type RequestOptions = {
+export type RequestOptionsT = {
   url: string,
-  method: RequestMethod,
+  method: RequestMethodT,
   data?: unknown
 };
 
@@ -21,7 +21,7 @@ function createRequestHeaders(): Headers {
 }
 
 export class HTTPController {
-  static makeRequest(options: RequestOptions): Promise<Response> {
+  static makeRequest(options: RequestOptionsT): Promise<Response> {
     return window.fetch(
       options.url,
       {

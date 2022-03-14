@@ -1,10 +1,10 @@
-export type ExecAsyncResult<T = unknown, K = unknown> = {
+export type ExecAsyncResultT<T = unknown, K = unknown> = {
   data: T | null
   error: K | null
 }
 
-export async function execAsync<T = unknown, K extends Error = Error>(promiseLike: PromiseLike<T>): Promise<ExecAsyncResult<T, K>> {
-  const result: ExecAsyncResult<T, K> = {
+export async function execAsync<T = unknown, K extends Error = Error>(promiseLike: PromiseLike<T>): Promise<ExecAsyncResultT<T, K>> {
+  const result: ExecAsyncResultT<T, K> = {
     data: null,
     error: null
   };
