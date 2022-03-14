@@ -16,12 +16,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "removeComments": true,
+    "baseUrl": "."
   },
   "include": [
     "./src/**/*.ts"

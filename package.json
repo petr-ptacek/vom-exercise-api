@@ -1,5 +1,6 @@
 {
   "name": "@petr-ptacek/vom-exercise-api",
+  "type": "module",
   "version": "0.0.6",
   "author": {
     "name": "Petr Ptacek",
@@ -10,9 +11,7 @@
     "url": "git+https://github.com/petr-ptacek/vom-exercise-api.git"
   },
   "main": "./dist/vom-exercise-api.es.js",
-  "exports": {
-    ".": "./dist/vom-exercise-api.es.js"
-  },
+  "exports": "./dist/vom-exercise-api.es.js",
   "types": "./types/index.d.ts",
   "files": [
     "dist",
@@ -21,6 +20,7 @@
   ],
   "scripts": {
     "clear": "rimraf ./dist ./types",
+    "version": "npm run build",
     "dev": "vite build --mode production --watch --clearScreen --sourcemap",
     "build": "npm run clear && tsc && vite build && npm run build:types",
     "build:types": "rimraf ./types && tsc --project ./tsconfig.types.json",

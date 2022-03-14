@@ -5,7 +5,6 @@
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationDir": "./types",
-    "declarationMap": true,
-    "removeComments": true
+    "declarationMap": true
   }
 }
