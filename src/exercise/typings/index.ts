@@ -6,8 +6,7 @@ export interface IConstructorOptions {
 
 export interface ISetupData {
   totalSteps: number;
-  timeExpireNotifySeconds?: number;
-  timeExpireNotifyHandler?: () => void;
+  timeExpireNotifyHandlers: IData['timeExpire']['handlers'];
 }
 
 export interface IData {
@@ -18,11 +17,13 @@ export interface IData {
   currentStep: NullableT<number>;
   startAt: NullableT<Date>;
   configuration: NullableT<ConfigurationT>;
-  answers: NullableT<boolean>[];
+  userAnswers: NullableT<boolean>[];
+  countdown: boolean;
 
-  timeExpireCheckerIntervalId: number | null;
-  timeExpireNotifySeconds: number | null;
-  timeExpireNotifyHandler: (() => void) | null;
+  timeExpire: {
+    intervalId: number | null;
+    handlers: { [seconds: string | number]: ((() => void)[]) };
+  };
 }
 
 export interface IUserDefinedHooks {
@@ -41,7 +42,7 @@ export interface IUserDefinedHooks {
   onAllAnswersFilled(): Promise<boolean>;
 }
 
-export type ShowMessageOptionsT = {
+export type DialogMessageOptionsT = {
   type?: 'success' | 'error' | 'warning'
   title?: string;
   message?: string;

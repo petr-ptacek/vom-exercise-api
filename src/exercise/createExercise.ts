@@ -4,7 +4,7 @@ import { Exercise }                                                             
 export interface ICreateExerciseOptions extends IUserDefinedHooks {
 }
 
-export function createExercise(constructorOptions: IConstructorOptions, options: ICreateExerciseOptions) {
+export function createExercise(constructorOptions: IConstructorOptions, options: ICreateExerciseOptions): Exercise {
 
   return new class extends Exercise {
     constructor() {

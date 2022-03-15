@@ -12,6 +12,7 @@ async function parseResponse<T = any>(response: Response): ApiService.PromisifyR
 
   return {
     status: response.status,
+    ok: response.ok,
     data
   };
 }
@@ -19,6 +20,7 @@ async function parseResponse<T = any>(response: Response): ApiService.PromisifyR
 export namespace ApiService {
   export interface Response<T = any> {
     status: number;
+    ok: boolean;
     data?: T;
   }
 
