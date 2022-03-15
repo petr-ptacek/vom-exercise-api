@@ -1,7 +1,7 @@
 {
   "name": "@petr-ptacek/vom-exercise-api",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Petr Ptacek",
     "email": "petr.ptacek99@gmail.com"
