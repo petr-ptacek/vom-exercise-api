@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/exercise/index.ts"],"names":[],"mappings":"AAAA,cAA0C,WAAW,CAAC;AACtD,cAA0C,WAAW,CAAC;AACtD,OAAO,EAAE,QAAQ,EAAE,MAAuB,YAAY,CAAC;AACvD,OAAO,EAAE,yBAAyB,EAAE,MAAM,6BAA6B,CAAC;AACxE,OAAO,EAAE,kBAAkB,EAAE,MAAa,sBAAsB,CAAC;AACjE,OAAO,EAAE,cAAc,EAAE,MAAa,kBAAkB,CAAC;AACzD,YAAY,EAAE,gBAAgB,EAAE,MAAM,eAAe,CAAC"}

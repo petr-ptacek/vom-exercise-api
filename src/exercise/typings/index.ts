@@ -1,12 +1,21 @@
-import { DictionaryT, NullableT } from '../../typings';
+import type { DictionaryT, NullableT } from '../../typings';
+import type { IProvidedDataApi }       from '../DataService';
+
+export type TimerHighlightColorT = 'warn' | 'success' | 'error' | 'initial';
 
 export interface IConstructorOptions {
+  dataProviders: IProvidedDataApi;
   exerciseAttemptId: string;
+  timeExpireHandlers?: HandlersMapT;
+}
+
+export type HandlersMapT<T = ((() => void)[]) | (() => void)> = {
+  [key: string | number]: T;
 }
 
 export interface ISetupData {
   totalSteps: number;
-  timeExpireNotifyHandlers: IData['timeExpire']['handlers'];
+  timeExpireHandlers?: HandlersMapT;
 }
 
 export interface IData {
@@ -22,7 +31,7 @@ export interface IData {
 
   timeExpire: {
     intervalId: number | null;
-    handlers: { [seconds: string | number]: ((() => void)[]) };
+    handlers: HandlersMapT<(() => void)[]>;
   };
 }
 
@@ -42,14 +51,19 @@ export interface IUserDefinedHooks {
   onAllAnswersFilled(): Promise<boolean>;
 }
 
-export type DialogMessageOptionsT = {
-  type?: 'success' | 'error' | 'warning'
+export type DialogTypeT = 'success' | 'error' | 'warning';
+
+export type DialogOptionsT = {
+  type?: DialogTypeT;
   title?: string;
   message?: string;
-  confirmLabel?: string;
-  confirmCallback?: () => void;
-  cancelLabel?: string;
-  cancelCallback?: () => void;
+  closeable?: boolean;
+  onCloseHandler?: () => void;
+  buttons?: {
+    type?: 'success' | 'error' | 'warning';
+    label: string;
+    handler: () => void;
+  }[]
 }
 
 export type ValidationErrorT = {

@@ -1,36 +1,47 @@
 import type {
   DictionaryT,
   NullableT
-}                        from '../typings';
+} from '../typings';
+
 import type {
   CardT,
   ConfigurationT,
   LanguageT,
   MapT,
   MapTranslateT,
-  DialogMessageOptionsT,
+  DialogOptionsT,
   ValidationErrorT,
   IData,
   ISetupData,
   IConstructorOptions,
-  IUserDefinedHooks
-}                        from './typings';
-import { ApiService }    from '../service';
+  IUserDefinedHooks,
+  TimerHighlightColorT
+} from './typings';
+
+import { Timer }                from './Timer';
+import { DataService }          from './DataService';
 import {
   execAsync,
   isBoolean,
   isNull,
   isNumber
-}                        from '../utils';
-import { emitter }       from './emitter';
-import { exerciseUtils } from './exerciseUtils';
+}                               from '../utils';
+import { emitter, EVENT_NAMES } from './emitter';
+import { toMapOfArrayHandlers } from './utils';
 
 export abstract class Exercise implements IUserDefinedHooks {
   private readonly _data: IData;
+  private readonly _dataService: DataService;
+  private readonly _timer: Timer = new Timer();
   private readonly _emitter = emitter;
-  public readonly utils = exerciseUtils;
 
   constructor(options: IConstructorOptions) {
+    const { timeExpireHandlers = {} } = options;
+
+    this._dataService = new DataService({
+      dataProviders: options.dataProviders
+    });
+
     this._data = {
       loading: false,
       attemptId: options.exerciseAttemptId,
@@ -44,12 +55,12 @@ export abstract class Exercise implements IUserDefinedHooks {
 
       timeExpire: {
         intervalId: null,
-        handlers: {}
+        handlers: toMapOfArrayHandlers(timeExpireHandlers)
       }
     };
 
     this._emitter.emit(
-      'instance-created',
+      EVENT_NAMES.INSTANCE_CREATED,
       { exercise: this }
     );
   }
@@ -137,11 +148,11 @@ export abstract class Exercise implements IUserDefinedHooks {
   abstract onAllAnswersFilled(): Promise<boolean>;
 
   private async _validateServer(): Promise<ValidationErrorT[]> {
-    const result = await execAsync(
-      ApiService.validate(this._data.attemptId)
+    const { data } = await execAsync(
+      this._dataService.validate(this._data.attemptId)
     );
 
-    return (result.data?.data?.errors || [])
+    return (data?.data.errors || [])
       .map(
         error => ({ type: 'server', message: error })
       );
@@ -149,13 +160,13 @@ export abstract class Exercise implements IUserDefinedHooks {
 
   private async _writeStart() {
     return execAsync(
-      ApiService.startExercise(this._data.attemptId)
+      this._dataService.startExercise(this._data.attemptId)
     );
   }
 
-  private async _writeFinish() {
+  private async _writeFinish(duration: number) {
     return execAsync(
-      ApiService.finishExercise(this._data.attemptId)
+      this._dataService.finishExercise(this._data.attemptId, duration)
     );
   }
 
@@ -223,19 +234,20 @@ export abstract class Exercise implements IUserDefinedHooks {
       return false;
     }
 
-    await ApiService.setCurrentQuestion(
+    await this._dataService.setCurrentQuestion(
       this._data.attemptId,
       /** On the server is indexed from 1 to n */
       step + 1
     );
 
     this._data.currentStep = step;
-    this._emitter.emit('update-step', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.UPDATE_STEP, { exercise: this });
     return true;
   }
 
   private _cleanup() {
     this._data.startAt = null;
+    this._timer.stop();
     this._detachTimeExpiredWatcher();
   }
 
@@ -245,7 +257,15 @@ export abstract class Exercise implements IUserDefinedHooks {
 
   private _setup(data: ISetupData): void {
     this._data.totalSteps = data.totalSteps;
-    this._data.timeExpire.handlers = data.timeExpireNotifyHandlers ?? {};
+
+    Object.entries(toMapOfArrayHandlers(data?.timeExpireHandlers ?? {}))
+      .forEach(([key, arrHandlers]) => {
+        if ( this._data.timeExpire.handlers[key] ) {
+          this._data.timeExpire.handlers[key].push(...arrHandlers);
+        } else {
+          this._data.timeExpire.handlers[key] = arrHandlers;
+        }
+      });
   }
 
   private _postSetup() {
@@ -253,16 +273,16 @@ export abstract class Exercise implements IUserDefinedHooks {
   }
 
   private async _fetchConfigurationData(): Promise<void> {
-    const { data: response, error } = await execAsync(
-      ApiService.getExerciseConfiguration(this._data.attemptId)
+    const { data: result, error } = await execAsync(
+      this._dataService.getConfiguration(this._data.attemptId)
     );
 
-    if ( error || response?.status !== 200 ) {
+    if ( error || !result?.ok ) {
       throw new Error('[fetchConfigurationData] failed!');
     }
 
-    if ( response ) {
-      this._data.configuration = response.data as ConfigurationT;
+    if ( result.data ) {
+      this._data.configuration = result.data as ConfigurationT;
     }
   }
 
@@ -283,7 +303,7 @@ export abstract class Exercise implements IUserDefinedHooks {
 
     this._data.initialized = await this.onInitialized(await this._validate());
 
-    this._emitter.emit('initialized', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.INITIALIZED, { exercise: this });
     return this._data.initialized;
   }
 
@@ -293,18 +313,20 @@ export abstract class Exercise implements IUserDefinedHooks {
     }
 
     const { error } = await execAsync(
-      ApiService.setCurrentAnswer(this._data.attemptId, step + 1, answer)
+      this._dataService.setCurrentAnswer(
+        this._data.attemptId, step + 1, answer
+      )
     );
 
     this._data.userAnswers[step] = answer;
-    this._emitter.emit('answer-set', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.ANSWER_SET, { exercise: this });
 
     if (
       this._data.userAnswers.length &&
       this._data.userAnswers.every(answer => isBoolean(answer))
     ) {
       await this.onAllAnswersFilled();
-      this._emitter.emit('all-answers-filled', { exercise: this });
+      this._emitter.emit(EVENT_NAMES.ALL_ANSWERS_FILLED, { exercise: this });
     }
 
     return !!error;
@@ -312,8 +334,9 @@ export abstract class Exercise implements IUserDefinedHooks {
 
   public getTime(): number {
     return !isNull(this._data.startAt) ?
-      (Date.now() - this._data.startAt.getTime()) / 1000 :
-      0;
+      this._timer.counter : 0;
+    // (Date.now() - this._data.startAt.getTime()) / 1000 :
+    // 0;
   }
 
   public getTimeRemaining(): number | null {
@@ -324,11 +347,12 @@ export abstract class Exercise implements IUserDefinedHooks {
       return null;
     }
 
-    const maxDurationMilliseconds = this._data.configuration?.max_duration_minutes! * 60 * 1000;
-    const { startAt } = this._data;
-    const remainingMilliseconds = (startAt.getTime() + maxDurationMilliseconds) - Date.now();
+    const maxDurationSeconds = this._data.configuration?.max_duration_minutes! * 60;
+    const differenceSeconds = maxDurationSeconds - this._timer.counter;
 
-    return (remainingMilliseconds >= 0 ? remainingMilliseconds : 0) / 1000;
+    return (differenceSeconds >= 0) ?
+      differenceSeconds :
+      0;
   }
 
   public async stepNext(): Promise<boolean> {
@@ -361,15 +385,16 @@ export abstract class Exercise implements IUserDefinedHooks {
       this._attachTimeExpiredWatcher();
     }
 
-    this._emitter.emit('start', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.START, { exercise: this });
+    this._timer.start();
     return true;
   }
 
   public async end(): Promise<void> {
-    await this._writeFinish();
+    this._writeFinish(this._timer.counter);
     this._cleanup();
     await this.onEnd();
-    this._emitter.emit('end', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.END, { exercise: this });
   }
 
   public beforeEnd(): Promise<boolean> {
@@ -377,29 +402,42 @@ export abstract class Exercise implements IUserDefinedHooks {
   }
 
   public async timeExpired(): Promise<void> {
+    this._writeFinish(this._timer.counter);
     this._cleanup();
-    await this._writeFinish();
-    await this.onTimeExpired();
-    this._emitter.emit('time-expired', { exercise: this });
+    const preventDefault = await this.onTimeExpired();
+    this._emitter.emit(
+      EVENT_NAMES.TIME_EXPIRED,
+      {
+        exercise: this,
+        preventDefault
+      }
+    );
   }
 
   public showLoader(): void {
     this._data.loading = true;
-    this._emitter.emit('loader-show', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.LOADER_SHOW, { exercise: this });
   }
 
   public hideLoader(): void {
     this._data.loading = false;
-    this._emitter.emit('loader-hide', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.LOADER_HIDE, { exercise: this });
+  }
+
+  public highlightTimer(color: TimerHighlightColorT): void {
+    this._emitter.emit(EVENT_NAMES.TIMER_HIGHLIGHT, {
+      exercise: this,
+      data: { color }
+    });
   }
 
   public exit(): void {
-    this._emitter.emit('exit', { exercise: this });
+    this._emitter.emit(EVENT_NAMES.EXIT, { exercise: this });
   }
 
-  public showDialogMessage(options: DialogMessageOptionsT): void {
+  public showDialog(options: DialogOptionsT): void {
     this._emitter.emit(
-      'message-show',
+      EVENT_NAMES.SHOW_DIALOG,
       {
         exercise: this,
         data: options
@@ -452,18 +490,18 @@ export abstract class Exercise implements IUserDefinedHooks {
   }
 
   public async getMap(mapId: string): Promise<MapT> {
-    return (await ApiService.getMap(this._data.attemptId, mapId)).data!;
+    return (await this._dataService.getMap(this._data.attemptId, mapId)).data!;
   }
 
   public async getTranslate(mapTranslateId: string): Promise<MapTranslateT> {
-    return (await ApiService.getMapTranslate(mapTranslateId)).data!;
+    return (await this._dataService.getMapTranslate(mapTranslateId)).data!;
   }
 
   public async getCard(mapTranslateId: string, cardId: string): Promise<CardT> {
-    return (await ApiService.getCard(mapTranslateId, cardId)).data!;
+    return (await this._dataService.getCard(mapTranslateId, cardId)).data!;
   }
 
   public async getCards(mapTranslateId: string): Promise<CardT[]> {
-    return (await ApiService.getCards(mapTranslateId)).data!;
+    return (await this._dataService.getCards(mapTranslateId)).data!;
   }
 }

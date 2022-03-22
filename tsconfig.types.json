@@ -4,7 +4,7 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "declarationDir": "./dist",
-    "declarationMap": true
+    "declarationMap": true,
+    "declarationDir": "./types"
   }
 }

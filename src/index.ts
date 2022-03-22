@@ -1,8 +1,13 @@
-import { emitter, Exercise, createExercise, createUserExercise } from './exercise';
+import {
+  emitter,
+  Exercise,
+  createExercise,
+  createUserExercise
+} from './exercise';
 
 interface IExerciseApi {
   exercise: Exercise | null;
-  createExercise: typeof createExercise | null;
+  createExercise: typeof createExercise;
   createUserExercise: typeof createUserExercise | null;
   addEventListener: typeof emitter.on;
   removeEventListener: typeof emitter.off;
@@ -12,14 +17,13 @@ interface IExerciseApi {
 declare global {
   interface Window {
     ExerciseApi: IExerciseApi;
-    Urls: { [key: string]: (...args: unknown[]) => string };
   }
 }
 
 const ExerciseApi: IExerciseApi = {
   exercise: null,
-  createExercise: null,
   createUserExercise: null,
+  createExercise: createExercise,
   addEventListener: emitter.on,
   removeEventListener: emitter.off,
   dispatchEvent: emitter.emit
@@ -33,19 +37,33 @@ export type {
   MapT,
   MapTranslateT,
   CardT,
-  LanguageT
+  LanguageT,
+  EventsT,
+  IEventPayload,
+  IEventPayloadShowDialog,
+  IEventPayloadTimerHighlight,
+  IProvidedDataApi
 } from './exercise';
+
+
+export type {
+  IExerciseApi
+};
 
 export {
   Exercise,
-  exerciseUtils as utils
-} from './exercise';
-
-export type {
+  emitter,
+  EVENT_NAMES,
   createExercise,
   createUserExercise,
-  IExerciseApi
-};
+  createUserExerciseFactory
+} from './exercise';
+
+export {
+  computeAreaBasedAspectRatio,
+  getRandomNumber,
+  shuffleArray
+} from './utils';
 
 export {
   ExerciseApi

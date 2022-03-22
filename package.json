@@ -12,17 +12,20 @@
   },
   "main": "./dist/vom-exercise-api.es.js",
   "exports": "./dist/vom-exercise-api.es.js",
-  "types": "./dist/index.d.ts",
+  "types": "./types/index.d.ts",
   "files": [
     "dist",
-    "src"
+    "src",
+    "types"
   ],
   "scripts": {
     "clear": "rimraf ./dist ./types",
-    "dev": "vite build --mode production --watch --clearScreen --sourcemap",
+    "dev": "npm run clear && npm run watch",
     "build": "npm run clear && npm run build:src && npm run build:types",
     "build:src": "tsc && vite build",
-    "build:types": "tsc --project ./tsconfig.types.json",
+    "build:types": "tsc --build ./tsconfig.types.json",
+    "watch": "run-p -l \"watch:src\" \"watch:types\"",
+    "watch:src": "vite build --mode production --watch --clearScreen --sourcemap",
     "watch:types": "npm run build:types -- --watch"
   },
   "devDependencies": {
